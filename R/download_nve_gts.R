@@ -63,7 +63,7 @@ download_nve_gts <- function(name, coordinate_list, first_date, last_date, layer
 
   # Generate URLs
   url_list <- sprintf(
-    "https://gts.nve.no/api/GridTimeSeries/%d/%d/%s/%s/%s.json",
+    "https://gts.nve.no/api/GridTimeSeries/%.0f/%.0f/%s/%s/%s.json",
     coordinate_list$X, coordinate_list$Y, first_date, last_date, layer
   )
 
