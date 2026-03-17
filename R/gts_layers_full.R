@@ -30,8 +30,8 @@
 #' # Find all daily layers
 #' Filter(function(x) x$TimeResolutionInMinutes == 1440L, gts_layers_full) |>
 #'   sapply(\(x) x$Name)
-"gts_layers_full"
-
+#'
+#' @export
 gts_layers_full <- list(
   list(
     Name = "rr",

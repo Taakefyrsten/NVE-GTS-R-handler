@@ -19,8 +19,8 @@
 #' @seealso \code{\link{gts_layers_full}}, \code{\link{download_nve_gts}}
 #'
 #' @source \url{https://gts.nve.no/api/}
-"VALID_GTS_LAYER_NAMES"
-
+#'
+#' @export
 VALID_GTS_LAYER_NAMES <- c(
   "rr","rr3d","rr1h","rr3h","rrl","rrl3h","rrprrrxm5","rr3hprrr3hxm5","rrsc",
   "rrsc3h","darr3h","tm","tm1h","tm3h","datm3h","swe","swe3h","snowload",

@@ -38,6 +38,7 @@ the earliest date available for every layer in
 # Find all daily layers
 Filter(function(x) x$TimeResolutionInMinutes == 1440L, gts_layers_full) |>
   sapply(\(x) x$Name)
+
 }
 \seealso{
 \code{\link{VALID_GTS_LAYER_NAMES}}, \code{\link{download_nve_gts}}

@@ -1,7 +1,7 @@
 Package: NveGTSRequesteR
 Type: Package
 Title: Download and Load NVE Grid Time Series Data
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: c(
     person(
       "Einar E.", "Låker",
@@ -11,10 +11,11 @@ Authors@R: c(
 Description: Simplifies bulk downloading of gridded environmental time series
   from the Norwegian Water Resources and Energy Directorate (NVE) Grid Time
   Series (GTS) REST API (<https://gts.nve.no/api/>). Data is fetched in
-License: MIT + file LICENSEr', written to disk in batches to avoid
+  parallel using 'httr2' and 'furrr', written to disk in batches to avoid
   memory exhaustion, and can be resumed after interruption. Covers all
   available GTS layers including precipitation, temperature, snow, wind, and
   hydrological indices.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.3
