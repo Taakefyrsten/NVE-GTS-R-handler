@@ -5,6 +5,7 @@ Version: 1.0.0
 Authors@R: 
     person(
       "Einar E.", "Låker",
+      email: "Taakefyrsten@users.noreply.github.com"
       role = c("aut", "cre")
     )
 Description: Simplifies bulk downloading of gridded environmental time series
