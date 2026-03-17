@@ -1,3 +1,26 @@
+#' Valid NVE GTS layer names
+#'
+#' A character vector of all layer short-codes accepted by the NVE Grid Time
+#' Series API. Used as the default and validation set for the \code{layer}
+#' argument of \code{\link{download_nve_gts}}.
+#'
+#' For full metadata on each layer (Norwegian full name, unit, time resolution,
+#' and earliest available date) see \code{\link{gts_layers_full}}.
+#'
+#' @format A character vector with 76 elements. Selected examples:
+#' \describe{
+#'   \item{rr}{Daily precipitation (mm)}
+#'   \item{tm}{Daily mean temperature (°C, stored as Kelvin)}
+#'   \item{swe}{Snow water equivalent (mm)}
+#'   \item{sd}{Snow depth (raw mm, displayed as cm)}
+#'   \item{windSpeed10m24h06}{10 m wind speed, daily (m/s)}
+#' }
+#'
+#' @seealso \code{\link{gts_layers_full}}, \code{\link{download_nve_gts}}
+#'
+#' @source \url{https://gts.nve.no/api/}
+"VALID_GTS_LAYER_NAMES"
+
 VALID_GTS_LAYER_NAMES <- c(
   "rr","rr3d","rr1h","rr3h","rrl","rrl3h","rrprrrxm5","rr3hprrr3hxm5","rrsc",
   "rrsc3h","darr3h","tm","tm1h","tm3h","datm3h","swe","swe3h","snowload",

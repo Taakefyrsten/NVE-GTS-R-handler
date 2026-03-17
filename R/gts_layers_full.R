@@ -1,3 +1,37 @@
+#' Full metadata for all NVE GTS layers
+#'
+#' A list of lists, each describing one layer available through the NVE Grid
+#' Time Series API. Provides human-readable names, units, time resolution, and
+#' the earliest date available for every layer in
+#' \code{\link{VALID_GTS_LAYER_NAMES}}.
+#'
+#' @format A list with 76 elements. Each element is a named list with the
+#'   following fields:
+#' \describe{
+#'   \item{Name}{Character. The layer short-code used in API requests (matches
+#'     an entry in \code{\link{VALID_GTS_LAYER_NAMES}}).}
+#'   \item{Fullname}{Character. Norwegian descriptive name of the layer.}
+#'   \item{NoDataValue}{Integer. Sentinel value used by the API to indicate
+#'     missing data.}
+#'   \item{RawUnit}{Character. Unit of the raw values returned by the API.}
+#'   \item{HumanReadableUnit}{Character. Unit after any scaling applied for
+#'     display (may differ from \code{RawUnit}, e.g. Kelvin vs. Celsius).}
+#'   \item{TimeResolutionInMinutes}{Integer. Temporal resolution of the layer
+#'     in minutes (e.g. 1440 = daily, 60 = hourly).}
+#'   \item{FirstDateInTimeSerie}{Character. Earliest date available for this
+#'     layer in \code{"YYYY-MM-DD"} format.}
+#' }
+#'
+#' @seealso \code{\link{VALID_GTS_LAYER_NAMES}}, \code{\link{download_nve_gts}}
+#'
+#' @source \url{https://gts.nve.no/api/}
+#'
+#' @examples
+#' # Find all daily layers
+#' Filter(function(x) x$TimeResolutionInMinutes == 1440L, gts_layers_full) |>
+#'   sapply(\(x) x$Name)
+"gts_layers_full"
+
 gts_layers_full <- list(
   list(
     Name = "rr",
