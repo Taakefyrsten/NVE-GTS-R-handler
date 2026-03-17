@@ -2,12 +2,14 @@ Package: NveGTSRequesteR
 Type: Package
 Title: Download and Load NVE Grid Time Series Data
 Version: 1.0.0
-Authors@R: 
+Authors@R:
+  c(
     person(
       "Einar E.", "Låker",
-      email: "Taakefyrsten@users.noreply.github.com"
+      email = "Taakefyrsten@users.noreply.github.com",
       role = c("aut", "cre")
     )
+  )
 Description: Simplifies bulk downloading of gridded environmental time series
   from the Norwegian Water Resources and Energy Directorate (NVE) Grid Time
   Series (GTS) REST API (<https://gts.nve.no/api/>). Data is fetched in

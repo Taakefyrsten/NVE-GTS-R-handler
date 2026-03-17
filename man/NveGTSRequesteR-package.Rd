@@ -44,7 +44,7 @@ required.
 }
 
 \author{
-\strong{Maintainer}: Einar E. Låker
+\strong{Maintainer}: Einar E. Låker \email{Taakefyrsten@users.noreply.github.com}
 
 }
 \keyword{internal}
