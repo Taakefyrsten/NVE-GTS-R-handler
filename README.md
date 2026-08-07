@@ -31,19 +31,41 @@ Coordinates go in as a data frame with numeric `X` and `Y` columns in **UTM33N
 metres** (EPSG:25833) — the only thing the API accepts. Any other columns are
 ignored, so you can keep your site names alongside.
 
+Points rarely arrive in UTM33N, though. A GPS, a phone, or anything exported
+from a web map gives you lon/lat, so the first step is usually a reprojection:
+
 ```r
 library(NveGTSRequesteR)
 library(future)
+library(sf)
 
 # Requests are network-bound, so a worker per core is a floor, not a ceiling.
 # availableCores() respects container/HPC limits that detectCores() ignores.
 plan(multisession, workers = parallelly::availableCores() - 1)
 
+# Sites as recorded in the field: decimal degrees
 sites <- data.frame(
   site = c("upper_weir", "lower_weir", "ridge", "valley_floor"),
-  X    = c(269390, 270420, 271980, 272510),
-  Y    = c(6653390, 6654120, 6655870, 6656340)
+  lon  = c(10.86961, 10.88719, 10.91312, 10.92207),
+  lat  = c(59.95312, 59.96023, 59.97677, 59.98128)
 )
+
+# Two different jobs, both spelled `crs =`:
+#   st_as_sf(crs = 4326)      DECLARES what the numbers already are. Converts
+#                             nothing. 4326 = WGS84 lon/lat, what a GPS gives.
+#   st_transform(crs = 25833) CONVERTS to that target. 25833 = ETRS89 /
+#                             UTM zone 33N, the only CRS the NVE API accepts.
+# ETRS89 UTM codes are 25800 + zone, so zone 32 = 25832 and zone 35 = 25835.
+# Most Norwegian data is already 25833; far-north and international sources
+# often are not. Get the declaration wrong and st_transform() will happily
+# convert from the wrong place and hand you plausible-looking rubbish.
+sites_utm33 <- st_as_sf(sites, coords = c("lon", "lat"), crs = 4326) |>
+  st_transform(crs = 25833)
+
+sites$X <- st_coordinates(sites_utm33)[, "X"]
+sites$Y <- st_coordinates(sites_utm33)[, "Y"]
+
+# Already in UTM33N? Skip all of the above and set X and Y directly.
 
 # Daily mean temperature for 2023. Returns the folder it wrote to.
 folder <- download_nve_gts(
@@ -84,10 +106,8 @@ area <- read_sf("~/my_area.geojson")
 st_crs(area)    # check what you actually have before assuming
 st_bbox(area)   # UTM33N northings over Norway run roughly 6.45e6-7.95e6
 
-# EPSG:25833 = ETRS89 / UTM zone 33N, the only CRS the NVE API accepts.
-# ETRS89 UTM codes are 25800 + zone, so zone 32 = 25832, zone 35 = 25835.
-# Most Norwegian data is already 25833; far-north and international sources
-# often are not.
+# `crs =` is the target; the source is read off the object. See above for what
+# 25833 is and why the API insists on it.
 area_utm33 <- st_transform(area, crs = 25833)
 
 # One point per 1 km grid cell whose centre falls inside the polygon
