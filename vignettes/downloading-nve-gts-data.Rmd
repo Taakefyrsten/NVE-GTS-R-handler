@@ -1,0 +1,333 @@
+---
+title: "Downloading NVE Grid Time Series data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Downloading NVE Grid Time Series data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
+```
+
+The NVE Grid Time Series (GTS) API serves gridded environmental data for Norway
+on a 1 km grid: precipitation, temperature, snow, wind, soil moisture,
+groundwater and a pile of derived hydrological indices. You query it one grid
+point at a time, over a date range, and get a JSON time series back.
+
+`NveGTSRequesteR` handles the tedious parts: building the URLs, fetching them in
+parallel, writing results to disk in batches so a long job cannot eat your RAM,
+and picking up where it left off if the job dies halfway.
+
+This vignette walks through a full job in pieces, so you can stop after the
+part you actually need.
+
+## 1. Setup
+
+```{r}
+library(NveGTSRequesteR)
+library(future)
+library(sf)
+library(dplyr)
+library(purrr)
+```
+
+Parallel fetching is opt-in: `download_nve_gts()` calls `furrr::future_map()`,
+which runs sequentially unless you set a `future::plan()` first.
+
+```{r}
+plan(multisession, workers = parallelly::availableCores() - 1)  # availableCores() is the count to use: it respects cgroup/container/HPC limits that detectCores() ignores; subtract 1 to leave a core for your own session
+```
+
+These are network-bound requests, not CPU-bound work, so you can safely go
+above your core count if the API keeps up — `workers = 12` on an 8-core machine
+is not unreasonable. Do not go wild; you are hitting a public service.
+
+## 2. Pick a layer
+
+`VALID_GTS_LAYER_NAMES` is the list of short-codes the API accepts.
+`gts_layers_full` carries the metadata for each one: full name, unit, time
+resolution, no-data sentinel, and how far back the series goes.
+
+```{r}
+# Daily layers only (1440 minutes = 24 hours)
+gts_layers_full |>
+  keep(\(x) x$TimeResolutionInMinutes == 1440L) |>
+  map_chr(\(x) x$Name)
+
+# What does "tm" actually give me?
+gts_layers_full |>
+  detect(\(x) x$Name == "tm") |>
+  str()
+#> List of 8
+#>  $ Name                   : chr "tm"
+#>  $ Fullname               : chr "Døgntemperatur"
+#>  $ FullnameEN             : chr "Daily mean temperature"
+#>  $ NoDataValue            : int 65535
+#>  $ RawUnit                : chr "Kelvin"
+#>  $ HumanReadableUnit      : chr "Celcius"
+#>  $ TimeResolutionInMinutes: int 1440
+#>  $ FirstDateInTimeSerie   : chr "1957-01-01"
+```
+
+`FullnameEN` is this package's own addition — the API returns only the
+Norwegian `Fullname`. Layer names are terse, so it spells out the jargon:
+
+```{r}
+gts_layers_full |>
+  keep(\(x) x$Name %in% c("swe", "qtt", "sca")) |>
+  map_chr(\(x) x$FullnameEN)
+#> [1] "Snow water equivalent (depth of water the snowpack would give if fully melted)"
+#> [2] "Snow-covered area (share of the grid cell lying under snow)"
+#> [3] "Water input to the ground (rain plus snowmelt reaching the surface)"
+```
+
+Check `FirstDateInTimeSerie` before you set your date range. Most of the
+seNorge-derived layers start in 1957; the model-derived ones often start in
+2010 or 2018, and asking for earlier dates gets you no-data values rather than
+an error.
+
+## 3. Get your coordinates
+
+`download_nve_gts()` wants a data frame with numeric `X` and `Y` columns in
+**UTM33N metres**. That is the only thing the API speaks. There are two normal
+ways to arrive there.
+
+### 3a. A handful of known points
+
+```{r}
+coords <- data.frame(
+  X = c(269390, 270000),
+  Y = c(6653390, 6654000)
+)
+```
+
+### 3b. A grid covering a polygon
+
+This is the common case: you have an area — a catchment, a municipality, a
+precipitation region — and you want every grid cell inside it.
+
+```{r}
+area <- read_sf("~/my_area.geojson")
+
+st_crs(area)   # what is the file actually in? Never assume
+st_bbox(area)  # sanity check: UTM33N northings over Norway run roughly 6.45e6–7.95e6
+```
+
+Most Norwegian datasets are already UTM33N, so this transform is often a no-op —
+but it is worth doing anyway. Data from the far north is frequently distributed
+in UTM35N, and anything sourced internationally tends to arrive in WGS84
+lat/long or in whatever UTM zone its own country uses.
+
+```{r}
+# `crs =` is the TARGET; the source CRS is read off the object itself.
+# EPSG:25833 = ETRS89 / UTM zone 33N. ETRS89 UTM codes are 25800 + zone number,
+# so zone 32 = 25832, zone 33 = 25833, zone 35 = 25835.
+# (For comparison: WGS84 UTM north is 32600 + zone, and plain WGS84 lat/long
+#  is 4326. NVE only accepts 25833 coordinates, whatever you started from.)
+area_utm33 <- st_transform(area, crs = 25833)
+```
+
+Now lay a regular grid over it. `cellsize = 1000` matches the native 1 km GTS
+grid — going finer just queries the same cells repeatedly.
+
+```{r}
+grid_points <- st_make_grid(area_utm33, cellsize = 1000, what = "centers") |>
+  st_intersection(area_utm33) |>   # keep only centres inside the polygon
+  st_coordinates() |>
+  as.data.frame() |>
+  setNames(c("X", "Y"))
+
+nrow(grid_points)  # this is your request count — look at it before downloading
+```
+
+That last line matters. One point × one layer × one date range is one HTTP
+request. A mid-sized municipality is a few thousand; half of Norway is a few
+hundred thousand.
+
+## 4. Download
+
+**Before you call it, look at `batch_size`.** The default of `100` points per
+batch is tuned for the large case — pulling an entire region, tens of thousands
+of points, where the batch is a memory ceiling and a resume checkpoint. That is
+not the usual job. Downloading twelve points for a few sites is far more common,
+and there the default leaves performance on the table: work is parallelised
+*within* a batch, so a batch smaller than your worker pool idles workers, and
+every batch boundary costs a disk write.
+
+Rule of thumb:
+
+- **Small job** (up to a few hundred points): set `batch_size` at or above your
+  point count so the whole thing runs as one parallel sweep.
+- **Large job** (thousands+): keep it near the default, and make it a multiple
+  of your worker count. Raise it if you have RAM to spare, lower it if each
+  response is huge (long date ranges, hourly layers).
+
+```{r}
+folder <- download_nve_gts(
+  name            = "my_area",
+  coordinate_list = grid_points,
+  first_date      = "2023-01-01",
+  last_date       = "2023-12-31",
+  layer           = "tm",
+  batch_size      = 100
+)
+
+folder
+#> "my_area_tm_2023-01-01_2023-12-31_x269-412_y6653-6698_4812pts"
+```
+
+The folder is created relative to your working directory and named after the
+request itself: layer, date range, the bounding box of your points rounded to
+whole kilometres, and the point count. Inside it you get one `.rds` per batch,
+plus a manifest.
+
+Three properties worth knowing:
+
+- **Resumable.** Batches whose `.rds` already exists are skipped. If the run
+  dies — and a region-sized run will eventually meet a flaky network — rerun
+  the identical call and it picks up where it stopped.
+- **It will not resume the wrong thing.** The manifest inside the folder stores
+  the full coordinate vector along with the dates, layer and batch size. A call
+  that differs in any of those is refused with an error naming the field, so
+  changing your date range and rerunning cannot silently give you a folder
+  half-full of last week's results. To genuinely start over in the same place,
+  clear it with `gts_folder_reset()`.
+- **Failures are silent.** `request_nve_gts()` returns `NULL` on any HTTP error
+  or network failure rather than aborting the whole run, so one bad point does
+  not kill a six-hour job. You check for these after loading.
+
+That second point is why the folder name is only a label and not the safety
+mechanism. A bounding box describes an *extent*, not a *set of points*: twelve
+scattered sites and a dense grid clipped from the same polygon produce the same
+name. The manifest is what tells them apart.
+
+## 5. Load the results back
+
+Pass the folder name straight through — no need to reconstruct it:
+
+```{r}
+results <- load_and_bind_gts_from_folder(folder)
+```
+
+If you are coming back to a folder in a later session, rebuild the name with
+`name_folder()` using the same arguments you downloaded with:
+
+```{r}
+folder <- name_folder("my_area", "tm", grid_points, "2023-01-01", "2023-12-31")
+```
+
+This returns a **flat list**, one element per grid point, in the same order as
+the coordinates you passed in — but not a data frame. Each element is the
+parsed JSON response:
+
+```{r}
+str(results[[1]])
+#> List of 11
+#>  $ Theme            : chr "tm"
+#>  $ FullName         : chr "Døgntemperatur"
+#>  $ NoDataValue      : int 65535
+#>  $ X                : int 269390
+#>  $ Y                : int 6653390
+#>  $ StartDate        : chr "01.01.2023 06:00:00"
+#>  $ EndDate          : chr "31.12.2023 06:00:00"
+#>  $ PrognoseStartDate: NULL
+#>  $ Unit             : chr "Celcius"
+#>  $ TimeResolution   : int 1440
+#>  $ Altitude         : int 163
+#>  $ Data             : List of 365
+```
+
+Note `Unit`: the API has already applied the scaling from `RawUnit` to
+`HumanReadableUnit` for you. `tm` comes back in Celsius, not Kelvin; `sd` in
+centimetres, not millimetres. `Data` is a bare array with no timestamps — the
+time axis is implied by `StartDate` plus `TimeResolution` minutes per step.
+
+The request that produced the data travels with it, so you can always tell what
+a loaded object actually is:
+
+```{r}
+attr(results, "gts_manifest")$first_date
+attr(results, "gts_manifest")$layer
+```
+
+Check for failed requests before you go further. Don't hand-count nulls — ask
+the question directly:
+
+```{r}
+every(results, \(x) !is.null(x))  # TRUE if all requests came back
+
+results <- compact(results)  # drop the failures, if you accept losing them
+```
+
+If some failed, the cheaper fix is usually to delete the affected batch files
+and rerun the same `download_nve_gts()` call — the resume logic refetches only
+what is missing.
+
+## 6. Rectangle it into a tibble
+
+The package stops at the list. Turning that into a tidy frame is a few lines,
+and worth writing once:
+
+```{r}
+gts_to_tibble <- function(x) {
+  start <- as.POSIXct(x$StartDate, format = "%d.%m.%Y %H:%M:%S", tz = "Europe/Oslo")
+  values <- unlist(x$Data)
+
+  tibble::tibble(
+    X        = x$X,
+    Y        = x$Y,
+    altitude = x$Altitude,
+    layer    = x$Theme,
+    unit     = x$Unit,
+    time     = start + (seq_along(values) - 1) * x$TimeResolution * 60,
+    value    = ifelse(values == x$NoDataValue, NA_real_, values)
+  )
+}
+
+gts <- results |>
+  map(gts_to_tibble) |>
+  list_rbind()
+
+gts
+#> # A tibble: 4,380 × 7
+#>         X       Y altitude layer unit    time                value
+#>     <int>   <int>    <int> <chr> <chr>   <dttm>              <dbl>
+#>  1 269390 6653390      163 tm    Celcius 2023-01-01 06:00:00   0.1
+#>  2 269390 6653390      163 tm    Celcius 2023-01-02 06:00:00  -5
+#>  ...
+```
+
+The `NoDataValue` check is the part people forget. `65535` is a sentinel, not a
+temperature — leave it in and it will quietly wreck every mean you compute.
+
+From here it is ordinary dplyr:
+
+```{r}
+gts |>
+  group_by(X, Y) |>
+  summarise(mean_temp = mean(value, na.rm = TRUE), .groups = "drop")
+```
+
+And back to spatial when you need it — the coordinates are still UTM33N, so
+that is what you tell `st_as_sf()`:
+
+```{r}
+gts_sf <- gts |>
+  group_by(X, Y) |>
+  summarise(mean_temp = mean(value, na.rm = TRUE), .groups = "drop") |>
+  st_as_sf(coords = c("X", "Y"), crs = 25833)  # `crs =` here DECLARES the CRS the numbers are already in — it does not convert
+```
+
+## 7. Cleaning up
+
+`.rds` batches for a large region add up. When you are done:
+
+```{r}
+gts_folder_reset(folder)
+```
+
+It asks for confirmation before deleting. This also removes the manifest, which
+is what frees the folder up to be reused for a different date range or a
+different set of points.

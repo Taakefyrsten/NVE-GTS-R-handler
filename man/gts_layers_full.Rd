@@ -5,12 +5,22 @@
 \alias{gts_layers_full}
 \title{Full metadata for all NVE GTS layers}
 \format{
-A list with 76 elements. Each element is a named list with the
+A list with 78 elements. Each element is a named list with the
   following fields:
 \describe{
   \item{Name}{Character. The layer short-code used in API requests (matches
     an entry in \code{\link{VALID_GTS_LAYER_NAMES}}).}
-  \item{Fullname}{Character. Norwegian descriptive name of the layer.}
+  \item{Fullname}{Character. Norwegian descriptive name of the layer, exactly
+    as returned by the API.}
+  \item{FullnameEN}{Character. English name of the layer. This field is
+    specific to this package and is \emph{not} part of the NVE API response -
+    do not expect it in data fetched directly from \code{gts.nve.no}. Where
+    NVE's Norwegian label is loose or inconsistent with the layer code, the
+    English name follows the quantity actually served rather than the literal
+    Norwegian (the Norwegian name for \code{swe} reads as "snow amount", but
+    it is given here as "Snow water equivalent"). A plain-language gloss is
+    added in parentheses where the term is jargon. Leading \code{*} and
+    \code{x} markers are kept from the Norwegian names.}
   \item{NoDataValue}{Integer. Sentinel value used by the API to indicate
     missing data.}
   \item{RawUnit}{Character. Unit of the raw values returned by the API.}

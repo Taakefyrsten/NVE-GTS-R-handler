@@ -8,8 +8,9 @@ gts_folder_reset(folder_name)
 }
 \arguments{
 \item{folder_name}{A character string giving the path to the folder to
-reset (relative to the current working directory). Typically the
-`<name>_<layer>` folder created by \code{\link{download_nve_gts}}.}
+reset (relative to the current working directory). This is the value
+returned by \code{\link{download_nve_gts}}, and can also be reconstructed
+with \code{\link{name_folder}}.}
 }
 \value{
 \code{TRUE} invisibly if files were deleted or the folder was
@@ -22,6 +23,12 @@ the specified folder. This is intended to clear previously downloaded GTS
 batch `.rds` files so that \code{\link{download_nve_gts}} can re-fetch from
 scratch. The folder itself is preserved; only its contents are removed.
 }
+\details{
+The folder's request manifest is deleted along with the batch files, which
+is what makes the folder reusable for a different date range or coordinate
+set - \code{\link{download_nve_gts}} refuses to write into a folder whose
+manifest describes a different request.
+}
 \section{Warning}{
 
 This function **permanently deletes files**. Deletion cannot be undone.
@@ -30,7 +37,7 @@ The user must type `TRUE` at the prompt to proceed.
 
 \examples{
 \dontrun{
-gts_folder_reset("oslo_area_tm")
+gts_folder_reset("oslo_area_tm_2023-01-01_2023-12-31_x269-270_y6653-6654_2pts")
 }
 
 }

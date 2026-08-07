@@ -1,7 +1,7 @@
 Package: NveGTSRequesteR
 Type: Package
 Title: Download and Load NVE Grid Time Series Data
-Version: 1.0.0
+Version: 2.0.0
 Authors@R:
   c(
     person(
@@ -24,4 +24,14 @@ RoxygenNote: 7.3.3
 Imports:
     httr2,
     furrr,
-    purrr
+    purrr,
+    utils
+Suggests:
+    knitr,
+    rmarkdown,
+    sf,
+    dplyr,
+    tibble,
+    future,
+    parallelly
+VignetteBuilder: knitr

@@ -4,25 +4,48 @@
 \alias{name_folder}
 \title{Construct the standard GTS output folder name}
 \usage{
-name_folder(name, layer)
+name_folder(name, layer, coordinate_list, first_date, last_date)
 }
 \arguments{
 \item{name}{A character string used as the prefix (e.g. a site or project
-name).}
+name). Must not contain a path separator.}
 
 \item{layer}{A character string giving the GTS layer short-code (e.g.
 `"tm"`, `"rr"`). See \code{\link{VALID_GTS_LAYER_NAMES}}.}
+
+\item{coordinate_list}{A data frame or list with numeric elements named `X`
+and `Y` (UTM33N metres), as passed to \code{\link{download_nve_gts}}.}
+
+\item{first_date, last_date}{Character strings giving the date range in
+`"YYYY-MM-DD"` format.}
 }
 \value{
-A character string of the form `"<name>_<layer>"`.
+A character string of the form
+  `"<name>_<layer>_<first_date>_<last_date>_x<range>_y<range>_<n>pts"`.
 }
 \description{
-Combines a user-supplied name and a GTS layer identifier into the folder
-name convention used throughout the package (`<name>_<layer>`).
+Builds the folder name used throughout the package. The name encodes
+everything that defines a request - the layer, the date range, the spatial
+extent of the coordinates and how many points there are - so that two
+different requests do not write into the same folder.
+}
+\details{
+Coordinates are summarised as their bounding box rounded to whole
+kilometres, which is lossless enough to read at a glance because the GTS
+grid itself is 1 km. Where the extent collapses to a single kilometre the
+range is printed once rather than twice (`x269` rather than `x269-269`).
+
+The folder name is a **human-readable label, not a unique key**. A bounding
+box identifies an extent, not a specific set of points: a sparse transect
+and a dense grid clipped from the same polygon share it. Uniqueness is
+enforced instead by the manifest \code{\link{download_nve_gts}} writes
+inside the folder, which stores the full coordinate vector and is compared
+against on every subsequent call.
 }
 \examples{
-name_folder("oslo_area", "tm")
-#> [1] "oslo_area_tm"
+coords <- data.frame(X = c(269390, 270000), Y = c(6653390, 6654000))
+name_folder("oslo_area", "tm", coords, "2023-01-01", "2023-12-31")
+#> [1] "oslo_area_tm_2023-01-01_2023-12-31_x269-270_y6653-6654_2pts"
 
 }
 \seealso{

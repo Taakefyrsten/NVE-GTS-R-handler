@@ -5,10 +5,10 @@
 \alias{VALID_GTS_LAYER_NAMES}
 \title{Valid NVE GTS layer names}
 \format{
-A character vector with 76 elements. Selected examples:
+A character vector with 78 elements. Selected examples:
 \describe{
   \item{rr}{Daily precipitation (mm)}
-  \item{tm}{Daily mean temperature (°C, stored as Kelvin)}
+  \item{tm}{Daily mean temperature (degrees C, stored as Kelvin)}
   \item{swe}{Snow water equivalent (mm)}
   \item{sd}{Snow depth (raw mm, displayed as cm)}
   \item{windSpeed10m24h06}{10 m wind speed, daily (m/s)}
@@ -26,8 +26,8 @@ Series API. Used as the default and validation set for the \code{layer}
 argument of \code{\link{download_nve_gts}}.
 }
 \details{
-For full metadata on each layer (Norwegian full name, unit, time resolution,
-and earliest available date) see \code{\link{gts_layers_full}}.
+For full metadata on each layer (Norwegian and English full name, unit, time
+resolution, and earliest available date) see \code{\link{gts_layers_full}}.
 }
 \seealso{
 \code{\link{gts_layers_full}}, \code{\link{download_nve_gts}}

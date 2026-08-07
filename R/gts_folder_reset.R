@@ -6,12 +6,19 @@
 #' scratch. The folder itself is preserved; only its contents are removed.
 #'
 #' @param folder_name A character string giving the path to the folder to
-#'   reset (relative to the current working directory). Typically the
-#'   `<name>_<layer>` folder created by \code{\link{download_nve_gts}}.
+#'   reset (relative to the current working directory). This is the value
+#'   returned by \code{\link{download_nve_gts}}, and can also be reconstructed
+#'   with \code{\link{name_folder}}.
 #'
 #' @return \code{TRUE} invisibly if files were deleted or the folder was
 #'   already empty; \code{FALSE} invisibly if the user cancelled the
 #'   operation.
+#'
+#' @details
+#' The folder's request manifest is deleted along with the batch files, which
+#' is what makes the folder reusable for a different date range or coordinate
+#' set - \code{\link{download_nve_gts}} refuses to write into a folder whose
+#' manifest describes a different request.
 #'
 #' @section Warning:
 #' This function **permanently deletes files**. Deletion cannot be undone.
@@ -21,7 +28,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' gts_folder_reset("oslo_area_tm")
+#' gts_folder_reset("oslo_area_tm_2023-01-01_2023-12-31_x269-270_y6653-6654_2pts")
 #' }
 #'
 #' @export
@@ -29,7 +36,7 @@ gts_folder_reset <- function(folder_name) {
   # This function deletes all files in a given folder NB !DANGER DANGER!
   # Ask the user to confirm
   confirm <- readline(
-    prompt = paste0("⚠️ This will DELETE ALL FILES in '", folder_name, "'.\n",
+    prompt = paste0("WARNING: This will DELETE ALL FILES in '", folder_name, "'.\n",
                     "Type 'TRUE' to continue: ")
   )
 

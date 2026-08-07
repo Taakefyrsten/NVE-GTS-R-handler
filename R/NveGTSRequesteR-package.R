@@ -11,20 +11,21 @@
 #' \enumerate{
 #'   \item Set up a parallel backend with \code{\link[future]{plan}}.
 #'   \item Call \code{\link{download_nve_gts}} with your coordinates, date
-#'     range, and layer. Batch `.rds` files are written to
-#'     `<name>_<layer>/`.
-#'   \item Load and combine results with
-#'     \code{\link{load_and_bind_gts_from_folder}}.
+#'     range, and layer. Batch `.rds` files are written to a folder named
+#'     after the request, and the folder name is returned.
+#'   \item Pass that folder name to
+#'     \code{\link{load_and_bind_gts_from_folder}} to load and combine the
+#'     results.
 #'   \item Optionally clear a batch folder with \code{\link{gts_folder_reset}}
 #'     to re-download from scratch.
 #' }
 #'
 #' @section Reference data:
 #' \itemize{
-#'   \item \code{\link{VALID_GTS_LAYER_NAMES}} — character vector of all
+#'   \item \code{\link{VALID_GTS_LAYER_NAMES}} - character vector of all
 #'     accepted layer codes.
-#'   \item \code{\link{gts_layers_full}} — full metadata list (Norwegian name,
-#'     unit, resolution, earliest date) for every layer.
+#'   \item \code{\link{gts_layers_full}} - full metadata list (Norwegian and
+#'     English name, unit, resolution, earliest date) for every layer.
 #' }
 #'
 #' @section API:
@@ -32,4 +33,5 @@
 #' required.
 #'
 #' @keywords internal
+#' @importFrom utils packageVersion
 "_PACKAGE"

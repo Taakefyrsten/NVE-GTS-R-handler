@@ -5,12 +5,22 @@
 #' the earliest date available for every layer in
 #' \code{\link{VALID_GTS_LAYER_NAMES}}.
 #'
-#' @format A list with 76 elements. Each element is a named list with the
+#' @format A list with 78 elements. Each element is a named list with the
 #'   following fields:
 #' \describe{
 #'   \item{Name}{Character. The layer short-code used in API requests (matches
 #'     an entry in \code{\link{VALID_GTS_LAYER_NAMES}}).}
-#'   \item{Fullname}{Character. Norwegian descriptive name of the layer.}
+#'   \item{Fullname}{Character. Norwegian descriptive name of the layer, exactly
+#'     as returned by the API.}
+#'   \item{FullnameEN}{Character. English name of the layer. This field is
+#'     specific to this package and is \emph{not} part of the NVE API response -
+#'     do not expect it in data fetched directly from \code{gts.nve.no}. Where
+#'     NVE's Norwegian label is loose or inconsistent with the layer code, the
+#'     English name follows the quantity actually served rather than the literal
+#'     Norwegian (the Norwegian name for \code{swe} reads as "snow amount", but
+#'     it is given here as "Snow water equivalent"). A plain-language gloss is
+#'     added in parentheses where the term is jargon. Leading \code{*} and
+#'     \code{x} markers are kept from the Norwegian names.}
 #'   \item{NoDataValue}{Integer. Sentinel value used by the API to indicate
 #'     missing data.}
 #'   \item{RawUnit}{Character. Unit of the raw values returned by the API.}
@@ -35,7 +45,8 @@
 gts_layers_full <- list(
   list(
     Name = "rr",
-    Fullname = "Døgnnedbør",
+    Fullname = "D\u00f8gnnedb\u00f8r",
+    FullnameEN = "Daily precipitation",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -44,7 +55,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "rr3d",
-    Fullname = "Nedbør siste 3 døgn",
+    Fullname = "Nedb\u00f8r siste 3 d\u00f8gn",
+    FullnameEN = "Precipitation, last 3 days",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -53,7 +65,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "rr1h",
-    Fullname = "Nedbør 1 time",
+    Fullname = "Nedb\u00f8r 1 time",
+    FullnameEN = "Precipitation, 1 hour",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -62,7 +75,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "rr3h",
-    Fullname = "Nedbør 3 timer",
+    Fullname = "Nedb\u00f8r 3 timer",
+    FullnameEN = "Precipitation, 3 hours",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -72,6 +86,7 @@ gts_layers_full <- list(
   list(
     Name = "rrl",
     Fullname = "Regn",
+    FullnameEN = "Rain (liquid precipitation only, excludes snow)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -81,6 +96,7 @@ gts_layers_full <- list(
   list(
     Name = "rrl3h",
     Fullname = "Regn",
+    FullnameEN = "Rain, 3 hours (liquid precipitation only, excludes snow)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -89,7 +105,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "rrprrrxm5",
-    Fullname = "*Nedbør i % av 5 år",
+    Fullname = "*Nedb\u00f8r i % av 5 \u00e5r",
+    FullnameEN = "*Precipitation as % of the 5-year return level (an amount expected about once every 5 years)",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -98,7 +115,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "rr3hprrr3hxm5",
-    Fullname = "3 timer nedbør i % av 5 års gjentaksnedbør 3t",
+    Fullname = "3 timer nedb\u00f8r i % av 5 \u00e5rs gjentaksnedb\u00f8r 3t",
+    FullnameEN = "3-hour precipitation as % of the 5-year 3-hour return level (an amount expected about once every 5 years)",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -107,7 +125,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "rrsc",
-    Fullname = "Nedbør som snø",
+    Fullname = "Nedb\u00f8r som sn\u00f8",
+    FullnameEN = "Precipitation falling as snow",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -116,7 +135,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "rrsc3h",
-    Fullname = "Nedbør som snø 3t",
+    Fullname = "Nedb\u00f8r som sn\u00f8 3t",
+    FullnameEN = "Precipitation falling as snow, 3 hours",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -125,7 +145,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "darr3h",
-    Fullname = "Disaggregert nedbør seNorge2018_v22.09",
+    Fullname = "Disaggregert nedb\u00f8r seNorge2018_v22.09",
+    FullnameEN = "Disaggregated precipitation, seNorge2018_v22.09 (daily totals split into 3-hour steps)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -134,7 +155,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "tm",
-    Fullname = "Døgntemperatur",
+    Fullname = "D\u00f8gntemperatur",
+    FullnameEN = "Daily mean temperature",
     NoDataValue = 65535L,
     RawUnit = "Kelvin",
     HumanReadableUnit = "Celcius",
@@ -144,6 +166,7 @@ gts_layers_full <- list(
   list(
     Name = "tm1h",
     Fullname = "Temperatur 1 time",
+    FullnameEN = "Temperature, 1 hour",
     NoDataValue = 65535L,
     RawUnit = "Kelvin",
     HumanReadableUnit = "Celcius",
@@ -153,6 +176,7 @@ gts_layers_full <- list(
   list(
     Name = "tm3h",
     Fullname = "Temperatur 3 timer",
+    FullnameEN = "Temperature, 3 hours",
     NoDataValue = 65535L,
     RawUnit = "Kelvin",
     HumanReadableUnit = "Celcius",
@@ -162,6 +186,7 @@ gts_layers_full <- list(
   list(
     Name = "datm3h",
     Fullname = "Disaggregert temperatur seNorge2018_v22.09",
+    FullnameEN = "Disaggregated temperature, seNorge2018_v22.09 (daily values split into 3-hour steps)",
     NoDataValue = 65535L,
     RawUnit = "Kelvin",
     HumanReadableUnit = "Celcius",
@@ -170,7 +195,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "swe",
-    Fullname = "Snømengde",
+    Fullname = "Sn\u00f8mengde",
+    FullnameEN = "Snow water equivalent (depth of water the snowpack would give if fully melted)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -179,7 +205,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "swe3h",
-    Fullname = "Snøens vannekvivalent 3t",
+    Fullname = "Sn\u00f8ens vannekvivalent 3t",
+    FullnameEN = "Snow water equivalent, 3 hours (water held in the snowpack)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -188,7 +215,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "snowload",
-    Fullname = "Snølast",
+    Fullname = "Sn\u00f8last",
+    FullnameEN = "Snow load (weight of the snowpack per square metre)",
     NoDataValue = 65535L,
     RawUnit = "kg/m2",
     HumanReadableUnit = "kg/m2",
@@ -197,7 +225,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "sd",
-    Fullname = "Snødybde",
+    Fullname = "Sn\u00f8dybde",
+    FullnameEN = "Snow depth",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "cm",
@@ -206,7 +235,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "sd3h",
-    Fullname = "Snødybde 3 timer",
+    Fullname = "Sn\u00f8dybde 3 timer",
+    FullnameEN = "Snow depth, 3 hours",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "cm",
@@ -215,7 +245,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "swepr",
-    Fullname = "Snømengde i prosent",
+    Fullname = "Sn\u00f8mengde i prosent",
+    FullnameEN = "Snow water equivalent as % of normal (this year's snowpack against the long-term average for the date)",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -224,7 +255,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "age",
-    Fullname = "Snøens alder",
+    Fullname = "Sn\u00f8ens alder",
+    FullnameEN = "Snow age (days since the snow fell)",
     NoDataValue = 255L,
     RawUnit = "Dager",
     HumanReadableUnit = "Dager",
@@ -233,7 +265,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "sca",
-    Fullname = "Snødekningsgrad",
+    Fullname = "Sn\u00f8dekningsgrad",
+    FullnameEN = "Snow-covered area (share of the grid cell lying under snow)",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -242,16 +275,18 @@ gts_layers_full <- list(
   ),
   list(
     Name = "ski",
-    Fullname = "Skiføre",
+    Fullname = "Skif\u00f8re",
+    FullnameEN = "Skiing conditions (categorical class, not a measurement)",
     NoDataValue = 255L,
-    RawUnit = "Skiføreklasse",
-    HumanReadableUnit = "Skiføreklasse",
+    RawUnit = "Skif\u00f8reklasse",
+    HumanReadableUnit = "Skif\u00f8reklasse",
     TimeResolutionInMinutes = 1440L,
     FirstDateInTimeSerie = "1957-01-01"
   ),
   list(
     Name = "qtt",
-    Fullname = "Regn og snøsmelting",
+    Fullname = "Regn og sn\u00f8smelting",
+    FullnameEN = "Water input to the ground (rain plus snowmelt reaching the surface)",
     NoDataValue = 255L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -260,7 +295,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "qtt3h",
-    Fullname = "Regn og snøsmelting siste 3 timer",
+    Fullname = "Regn og sn\u00f8smelting siste 3 timer",
+    FullnameEN = "Water input to the ground, last 3 hours (rain plus snowmelt)",
     NoDataValue = 255L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -269,7 +305,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "qtt7d",
-    Fullname = "Regn og snøsmelting siste uke",
+    Fullname = "Regn og sn\u00f8smelting siste uke",
+    FullnameEN = "Water input to the ground, last week (rain plus snowmelt)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -278,7 +315,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "qtt10d",
-    Fullname = "Regn og snøsmelting siste 10 dager",
+    Fullname = "Regn og sn\u00f8smelting siste 10 dager",
+    FullnameEN = "Water input to the ground, last 10 days (rain plus snowmelt)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -287,7 +325,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "qttsdai",
-    Fullname = "Sørpeskredindeks",
+    Fullname = "S\u00f8rpeskredindeks",
+    FullnameEN = "Slushflow index (hazard index for avalanches of water-saturated snow)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -297,6 +336,7 @@ gts_layers_full <- list(
   list(
     Name = "gwb_q",
     Fullname = "Avrenning",
+    FullnameEN = "Runoff (water leaving the area as streamflow)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -306,6 +346,7 @@ gts_layers_full <- list(
   list(
     Name = "gwb_eva",
     Fullname = "Fordampning",
+    FullnameEN = "Evapotranspiration (water lost to the air from soil and vegetation)",
     NoDataValue = 255L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -314,7 +355,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "qtt3dls",
-    Fullname = "*Vanntilførsel 3 døgn",
+    Fullname = "*Vanntilf\u00f8rsel 3 d\u00f8gn",
+    FullnameEN = "*Water input to the ground, 3 days (rain plus snowmelt)",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -324,6 +366,7 @@ gts_layers_full <- list(
   list(
     Name = "tmgr",
     Fullname = "Temperaturendring",
+    FullnameEN = "Temperature change over 24 hours",
     NoDataValue = 32767L,
     RawUnit = "Celcius/10",
     HumanReadableUnit = "Celcius",
@@ -332,7 +375,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "swechange7d",
-    Fullname = "Snø endring siste uke",
+    Fullname = "Sn\u00f8 endring siste uke",
+    FullnameEN = "Snow water equivalent, change over the last week",
     NoDataValue = 32767L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -341,7 +385,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "fsw",
-    Fullname = "Nysnø siste døgn",
+    Fullname = "Nysn\u00f8 siste d\u00f8gn",
+    FullnameEN = "New snow, last day (water equivalent, not depth)",
     NoDataValue = 255L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -350,7 +395,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "fsw3h",
-    Fullname = "Nysnø siste 3 timer",
+    Fullname = "Nysn\u00f8 siste 3 timer",
+    FullnameEN = "New snow, last 3 hours (water equivalent, not depth)",
     NoDataValue = 255L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -359,7 +405,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "fsw3d",
-    Fullname = "Nysnø siste 3 døgn",
+    Fullname = "Nysn\u00f8 siste 3 d\u00f8gn",
+    FullnameEN = "New snow, last 3 days (water equivalent, not depth)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -368,7 +415,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "fsw7d",
-    Fullname = "Nysnø siste uke",
+    Fullname = "Nysn\u00f8 siste uke",
+    FullnameEN = "New snow, last week (water equivalent, not depth)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -377,7 +425,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "sdfsw",
-    Fullname = "Nysnødybde",
+    Fullname = "Nysn\u00f8dybde",
+    FullnameEN = "New snow depth",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "cm",
@@ -386,7 +435,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "sdfsw3h",
-    Fullname = "Nysnødybde siste 3 timer",
+    Fullname = "Nysn\u00f8dybde siste 3 timer",
+    FullnameEN = "New snow depth, last 3 hours",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "cm",
@@ -395,7 +445,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "qsw",
-    Fullname = "Snøsmelting siste døgn",
+    Fullname = "Sn\u00f8smelting siste d\u00f8gn",
+    FullnameEN = "Snowmelt, last day",
     NoDataValue = 255L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -404,7 +455,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "qsw7d",
-    Fullname = "Snøsmelting sum siste uke",
+    Fullname = "Sn\u00f8smelting sum siste uke",
+    FullnameEN = "Snowmelt, total over the last week",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -413,7 +465,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "qsw3h",
-    Fullname = "Snøsmelting 3 timer",
+    Fullname = "Sn\u00f8smelting 3 timer",
+    FullnameEN = "Snowmelt, 3 hours",
     NoDataValue = 255L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -422,7 +475,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "lwc",
-    Fullname = "Snøtilstand",
+    Fullname = "Sn\u00f8tilstand",
+    FullnameEN = "Liquid water content of the snowpack (how wet the snow is)",
     NoDataValue = 255L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -431,7 +485,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "lwc3h",
-    Fullname = "Snøtilstand 3 timer",
+    Fullname = "Sn\u00f8tilstand 3 timer",
+    FullnameEN = "Liquid water content of the snowpack, 3 hours (how wet the snow is)",
     NoDataValue = 255L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -441,6 +496,7 @@ gts_layers_full <- list(
   list(
     Name = "gwb_sssdev",
     Fullname = "Jordas vannkapasitet",
+    FullnameEN = "Soil water storage deviation (how much wetter or drier the soil is than normal)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -450,6 +506,7 @@ gts_layers_full <- list(
   list(
     Name = "gwb_frd",
     Fullname = "Teledyp",
+    FullnameEN = "Frost depth (how deep the ground is frozen)",
     NoDataValue = 65535L,
     RawUnit = "cm",
     HumanReadableUnit = "cm",
@@ -459,6 +516,7 @@ gts_layers_full <- list(
   list(
     Name = "gwb_sssrel",
     Fullname = "Vannmetning i jord",
+    FullnameEN = "Relative soil water saturation (how full of water the soil is, 0-100%)",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -467,7 +525,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "sdfsw3d",
-    Fullname = "Nysnødybde 3 døgn",
+    Fullname = "Nysn\u00f8dybde 3 d\u00f8gn",
+    FullnameEN = "New snow depth, 3 days",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "cm",
@@ -476,7 +535,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "gwb_qttprrrxm200",
-    Fullname = "Vanntilførsel 1 døgn % 200 år",
+    Fullname = "Vanntilf\u00f8rsel 1 d\u00f8gn % 200 \u00e5r",
+    FullnameEN = "Water input over 1 day as % of the 200-year return level (an amount expected about once every 200 years)",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -485,7 +545,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "gwb_qtt3dprrrxm200",
-    Fullname = "Vanntilførsel 3 døgn % 200 år",
+    Fullname = "Vanntilf\u00f8rsel 3 d\u00f8gn % 200 \u00e5r",
+    FullnameEN = "Water input over 3 days as % of the 200-year return level (an amount expected about once every 200 years)",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -495,6 +556,7 @@ gts_layers_full <- list(
   list(
     Name = "gwb_qprqxyrx30yr",
     Fullname = "Avrenning i % av maksimum",
+    FullnameEN = "Runoff as % of the highest value seen in the last 30 years",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -503,7 +565,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "gwb_qttprqttxyrx30yr",
-    Fullname = "Vanntilførsel 1 døgn i % maks",
+    Fullname = "Vanntilf\u00f8rsel 1 d\u00f8gn i % maks",
+    FullnameEN = "Water input over 1 day as % of the highest value seen in the last 30 years",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -512,7 +575,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "gwb_qtt3dprqtt3dxyrx30yr",
-    Fullname = "Vanntilførsel 3 døgn i % maks",
+    Fullname = "Vanntilf\u00f8rsel 3 d\u00f8gn i % maks",
+    FullnameEN = "Water input over 3 days as % of the highest value seen in the last 30 years",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -521,7 +585,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "additionalSnowDepth",
-    Fullname = "Fokksnøindeks",
+    Fullname = "Fokksn\u00f8indeks",
+    FullnameEN = "Wind-drifted snow index (extra snow depth built up by wind-blown snow)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "cm",
@@ -531,6 +596,7 @@ gts_layers_full <- list(
   list(
     Name = "depthHoarIndex1",
     Fullname = "Antall grader pr meter pr dag",
+    FullnameEN = "Depth hoar index 1 (growth of weak crystal layers inside the snowpack; degrees per metre per day)",
     NoDataValue = 32767L,
     RawUnit = "C/m dager",
     HumanReadableUnit = "C/m dager",
@@ -540,6 +606,7 @@ gts_layers_full <- list(
   list(
     Name = "depthHoarIndex2",
     Fullname = "Begerkrystallindeks 2",
+    FullnameEN = "Depth hoar index 2 (days of weak crystal layer growth inside the snowpack)",
     NoDataValue = 65535L,
     RawUnit = "dager",
     HumanReadableUnit = "dager",
@@ -548,7 +615,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "gwb_qtt",
-    Fullname = "HBV Vanntilførsel",
+    Fullname = "HBV Vanntilf\u00f8rsel",
+    FullnameEN = "Water input to the ground, HBV model (rain plus snowmelt)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -558,6 +626,7 @@ gts_layers_full <- list(
   list(
     Name = "gwb_landslideindex1",
     Fullname = "xJordskredindeks",
+    FullnameEN = "xLandslide index (soil and debris slides)",
     NoDataValue = 65535L,
     RawUnit = "Index",
     HumanReadableUnit = "Index",
@@ -567,6 +636,7 @@ gts_layers_full <- list(
   list(
     Name = "gwb_landslideindex2",
     Fullname = "xJordskredindeks2",
+    FullnameEN = "xLandslide index 2 (soil and debris slides)",
     NoDataValue = 65535L,
     RawUnit = "Index",
     HumanReadableUnit = "Index",
@@ -575,7 +645,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "qttls",
-    Fullname = "*Vanntilførsel",
+    Fullname = "*Vanntilf\u00f8rsel",
+    FullnameEN = "*Water input to the ground (rain plus snowmelt)",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -584,7 +655,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "gwb_gwtdev",
-    Fullname = "Døgnendring Grunnvann",
+    Fullname = "D\u00f8gnendring Grunnvann",
+    FullnameEN = "Groundwater storage, change over 24 hours",
     NoDataValue = 32767L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -594,6 +666,7 @@ gts_layers_full <- list(
   list(
     Name = "gwb_gwt",
     Fullname = "Grunnvann",
+    FullnameEN = "Groundwater storage (water held below ground)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -602,7 +675,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "gwb_qtt3d",
-    Fullname = "HBV Vanntilførsel 3 døgn",
+    Fullname = "HBV Vanntilf\u00f8rsel 3 d\u00f8gn",
+    FullnameEN = "Water input to the ground over 3 days, HBV model (rain plus snowmelt)",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -611,7 +685,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "gwb_qttprgwb_rryr30yr",
-    Fullname = "Vanntilførsel 1 døgn",
+    Fullname = "Vanntilf\u00f8rsel 1 d\u00f8gn",
+    FullnameEN = "Water input over 1 day as % of the 30-year mean annual precipitation",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -620,7 +695,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "gwb_qtt3dlst",
-    Fullname = "Vanntilførsel 3 døgn",
+    Fullname = "Vanntilf\u00f8rsel 3 d\u00f8gn",
+    FullnameEN = "Water input over 3 days as % of the 30-year mean annual precipitation",
     NoDataValue = 65535L,
     RawUnit = "%",
     HumanReadableUnit = "%",
@@ -629,7 +705,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "sdfsw7d",
-    Fullname = "xNysnødybde 7 døgn",
+    Fullname = "xNysn\u00f8dybde 7 d\u00f8gn",
+    FullnameEN = "xNew snow depth, 7 days",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "cm",
@@ -638,7 +715,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "swerank",
-    Fullname = "Snømengde rangert (NY)",
+    Fullname = "Sn\u00f8mengde rangert (NY)",
+    FullnameEN = "Snow water equivalent, ranked against previous years (new)",
     NoDataValue = 255L,
     RawUnit = "",
     HumanReadableUnit = "",
@@ -647,7 +725,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "windDirection10m24h06",
-    Fullname = "Vindretning 10m døgn",
+    Fullname = "Vindretning 10m d\u00f8gn",
+    FullnameEN = "Wind direction at 10 m, daily (degrees the wind blows from)",
     NoDataValue = 65535L,
     RawUnit = "",
     HumanReadableUnit = "",
@@ -657,6 +736,7 @@ gts_layers_full <- list(
   list(
     Name = "windDirection10m1h",
     Fullname = "Vindretning 10m 1 time",
+    FullnameEN = "Wind direction at 10 m, 1 hour (degrees the wind blows from)",
     NoDataValue = 65535L,
     RawUnit = "",
     HumanReadableUnit = "",
@@ -666,6 +746,7 @@ gts_layers_full <- list(
   list(
     Name = "windDirection10m3h",
     Fullname = "Vindretning 10m 3 timer",
+    FullnameEN = "Wind direction at 10 m, 3 hours (degrees the wind blows from)",
     NoDataValue = 65535L,
     RawUnit = "",
     HumanReadableUnit = "",
@@ -674,7 +755,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "windSpeed10m24h06",
-    Fullname = "Vindhastighet 10m døgn",
+    Fullname = "Vindhastighet 10m d\u00f8gn",
+    FullnameEN = "Wind speed 10 m above ground, daily",
     NoDataValue = 65535L,
     RawUnit = "m/s",
     HumanReadableUnit = "m/s",
@@ -684,6 +766,7 @@ gts_layers_full <- list(
   list(
     Name = "windSpeed10m1h",
     Fullname = "Vindhastighet 10m 1 time",
+    FullnameEN = "Wind speed 10 m above ground, 1 hour",
     NoDataValue = 65535L,
     RawUnit = "m/s",
     HumanReadableUnit = "m/s",
@@ -693,6 +776,7 @@ gts_layers_full <- list(
   list(
     Name = "windSpeed10m3h",
     Fullname = "Vindhastighet 10m 3 timer",
+    FullnameEN = "Wind speed 10 m above ground, 3 hours",
     NoDataValue = 65535L,
     RawUnit = "m/s",
     HumanReadableUnit = "m/s",
@@ -701,7 +785,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "qswenergy",
-    Fullname = "Snøsmelting fra energibalanse model",
+    Fullname = "Sn\u00f8smelting fra energibalanse model",
+    FullnameEN = "Snowmelt from energy balance model",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -710,7 +795,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "qswenergy3h",
-    Fullname = "Snøsmelting 3timer fra energibalanse model",
+    Fullname = "Sn\u00f8smelting 3timer fra energibalanse model",
+    FullnameEN = "Snowmelt, 3 hours, from energy balance model",
     NoDataValue = 65535L,
     RawUnit = "mm",
     HumanReadableUnit = "mm",
@@ -719,7 +805,8 @@ gts_layers_full <- list(
   ),
   list(
     Name = "slushflowRatio",
-    Fullname = "Forholdstall sørpe",
+    Fullname = "Forholdstall s\u00f8rpe",
+    FullnameEN = "Slushflow ratio (index used in slushflow hazard assessment)",
     NoDataValue = 65535L,
     RawUnit = "Forholdstall",
     HumanReadableUnit = "Forholdstall",
@@ -729,9 +816,10 @@ gts_layers_full <- list(
   list(
     Name = "fmi10d",
     Fullname = "Fryse tine grader siste 10 dager",
+    FullnameEN = "Freeze-thaw degree days, last 10 days (accumulated freezing and thawing)",
     NoDataValue = 65535L,
-    RawUnit = "Døgngrader",
-    HumanReadableUnit = "Døgngrader",
+    RawUnit = "D\u00f8gngrader",
+    HumanReadableUnit = "D\u00f8gngrader",
     TimeResolutionInMinutes = 1440L,
     FirstDateInTimeSerie = "1957-01-01"
   )

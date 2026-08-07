@@ -33,15 +33,15 @@ one of \code{\link{VALID_GTS_LAYER_NAMES}}. Defaults to the first valid
 layer name.}
 
 \item{batch_size}{Integer. Number of URLs (grid points) to process per
-batch. Defaults to \code{100}.}
+batch. Defaults to \code{100}, which is tuned for region-sized jobs; see
+Details.}
 
 \item{verbose}{Logical. If \code{TRUE} (default), prints start and end
 timestamps to the console.}
 }
 \value{
-Called for its side-effect of writing `.rds` files to a subfolder
-  named `<name>_<layer>/` relative to the current working directory.
-  Returns \code{NULL} invisibly.
+The output folder name, invisibly. Called mainly for its
+  side-effect of writing `.rds` files into that folder.
 }
 \description{
 Fetches GTS data from the NVE API for a list of coordinates over a date
@@ -51,12 +51,30 @@ Already-completed batches are skipped automatically, making interrupted
 runs resumable.
 }
 \details{
-The output folder is created as `<name>_<layer>/` in the current working
-directory if it does not already exist. Each batch is saved as
-`<folder>/<folder>_<i>_results.rds`. Parallel fetching within each batch
-is handled by \code{\link[furrr]{future_map}}; configure a
-\code{\link[future]{plan}} before calling this function to enable
-parallelism.
+The output folder is created in the current working directory, named by
+\code{\link{name_folder}}, and each batch is saved inside it as
+`batch_<i>_results.rds`. Pass the returned folder name straight to
+\code{\link{load_and_bind_gts_from_folder}} to read the results back.
+
+\subsection{Choosing batch_size}{
+Requests are fetched in parallel \emph{within} a batch, and each completed
+batch is written to disk before the next begins. The batch is therefore
+both the memory ceiling and the resume checkpoint. The default of 100 suits
+large jobs - whole regions, tens of thousands of points - where those two
+properties matter. For a small job, a few dozen points, set `batch_size` at
+or above the point count so everything runs as one parallel sweep; a batch
+smaller than your worker pool leaves workers idle. Configure a
+\code{\link[future]{plan}} before calling to enable parallelism at all.
+}
+
+\subsection{Resuming and the manifest}{
+A manifest recording the layer, date range, batch size and full coordinate
+vector is written into the folder on the first call. Later calls compare
+their request against it and abort if it differs, so a changed date range
+or coordinate set can never resume into a folder holding something else.
+Rerunning an identical call skips batches whose file already exists and
+fetches only what is missing.
+}
 }
 \examples{
 \dontrun{
@@ -65,17 +83,21 @@ plan(multisession)
 
 coords <- data.frame(X = c(269390, 270000), Y = c(6653390, 6654000))
 
-download_nve_gts(
-  name       = "oslo_area",
+folder <- download_nve_gts(
+  name            = "oslo_area",
   coordinate_list = coords,
-  first_date = "2023-01-01",
-  last_date  = "2023-12-31",
-  layer      = "tm"
+  first_date      = "2023-01-01",
+  last_date       = "2023-12-31",
+  layer           = "tm",
+  batch_size      = nrow(coords)
 )
+
+results <- load_and_bind_gts_from_folder(folder)
 }
 
 }
 \seealso{
 \code{\link{load_and_bind_gts_from_folder}},
-  \code{\link{request_nve_gts}}, \code{\link{VALID_GTS_LAYER_NAMES}}
+  \code{\link{name_folder}}, \code{\link{request_nve_gts}},
+  \code{\link{VALID_GTS_LAYER_NAMES}}
 }
